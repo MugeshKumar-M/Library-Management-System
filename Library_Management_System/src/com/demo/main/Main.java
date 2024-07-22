@@ -1,10 +1,10 @@
 package com.demo.main;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpExchange;
-
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -12,13 +12,15 @@ import java.util.Scanner;
 import com.demo.main.Model.Book;
 import com.demo.main.Services.LibraryService;
 import com.demo.main.controller.Controller;
+import com.sun.net.httpserver.HttpServer;
 
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
 		System.out.println("Library Management System");
 	     LibraryService libraryService = new LibraryService(1.0); // Fine rate per day
+	     
+	     //sample data
 	     libraryService.addBook("978-3-16-148410-0", "Java Programming", "John Doe", "Programming");
 	        libraryService.addBook("978-0-07-180855-2", "Effective Java", "Joshua Bloch", "Programming");
 	        libraryService.addBook("978-1-4842-5434-8", "Pro Spring Boot", "Felipe Gutierrez", "Programming");
@@ -27,11 +29,10 @@ public class Main {
 	     
 	     HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 	        
-	        // Create a context for the /api endpoint
+	     //context path set "/api"
 	        server.createContext("/api", new Controller(libraryService, null));
 
-	        // Start the server
-	        server.setExecutor(null); // Creates a default executor
+	        server.setExecutor(null); 
 	        server.start();
 	        
 	        System.out.println("Server started on port 8080");
@@ -46,6 +47,7 @@ public class Main {
 			System.out.println("Press 4 - Return a book and Calculate overdue fine");
 			System.out.println("Press 5 - List all books");
 			System.out.println("Press 6 - Library Catalog");
+			System.out.println("Press 7- Order a book in online");
 			
 			String n = sc.next();
 			switch (n) {
@@ -71,6 +73,10 @@ public class Main {
 				break;
 			case "6":
 				libraryCatalog(libraryService);
+				System.out.println("case 5");
+				break;
+			case "7":
+				searchBookOnline();
 				System.out.println("case 5");
 				break;
 
@@ -150,6 +156,56 @@ libraryService.displayLibraryCatalog(libraryService);
 				for(Book singleBook : books) {
 					System.out.println(singleBook.toString());
 				}
+				break;
+			default:
+				return;
+			}
+		}
+		
+	}
+	
+	static void searchBookOnline() throws IOException {
+		Scanner sc = new Scanner(System.in);
+		while(true) {
+			System.out.println("Press 1 - Search a book in other distributor/wholesaler");
+			System.out.println("Press 2 - order a book in other distributor/wholesaler");
+			String choise = sc.nextLine();
+			switch (choise) {
+			case "1":
+				System.out.println("Enter the book ISBN Id ");
+				String isbnid = sc.nextLine();
+				
+				 URL url = new URL("http://localhost:8080/api/books/externalApi?isbnid="+isbnid);
+			        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			        conn.setRequestMethod("GET");
+			        InputStream inputStream = conn.getInputStream();
+			        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+			        StringBuilder response = new StringBuilder();
+			        char[] buffer = new char[1024];
+			        int read;
+			        while ((read = inputStreamReader.read(buffer)) != -1) {
+			            response.append(buffer, 0, read);
+			        }
+			        inputStreamReader.close();
+				System.out.println(response.toString());
+				break;
+			case "2":
+				System.out.println("Enter the book ISBN Id ");
+				String orderisbnid = sc.nextLine();
+				
+				 URL urll = new URL("http://localhost:8080/api/books/externalApi?order="+orderisbnid);
+			        HttpURLConnection conn1 = (HttpURLConnection) urll.openConnection();
+			        conn1.setRequestMethod("GET");
+			        InputStream inputStream1 = conn1.getInputStream();
+			        InputStreamReader inputStreamReaderr = new InputStreamReader(inputStream1);
+			        StringBuilder responsee = new StringBuilder();
+			        char[] bufferr = new char[1024];
+			        int readd;
+			        while ((readd = inputStreamReaderr.read(bufferr)) != -1) {
+			        	responsee.append(bufferr, 0, readd);
+			        }
+			        inputStreamReaderr.close();
+				System.out.println(responsee.toString());
 				break;
 			default:
 				return;

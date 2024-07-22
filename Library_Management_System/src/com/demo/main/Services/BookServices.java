@@ -14,8 +14,8 @@ public class BookServices {
         return apiClient.searchBookByIsbn(isbn);
     }
 
-    public void orderBook(String isbn) {
-        apiClient.placeOrder(isbn);
+    public String orderBook(String isbn) {
+       return apiClient.placeOrder(isbn);
     }
 }
 

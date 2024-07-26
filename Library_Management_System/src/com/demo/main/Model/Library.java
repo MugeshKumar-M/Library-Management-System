@@ -56,12 +56,12 @@ public class Library {
         return null;
     }
     
-    public boolean avaliablityCheck(String isbnId) {
-        for (Book book : books) {
-            if (book.getIsbnId().equalsIgnoreCase(isbnId)) {
-                return true;
-            }
-        }
+     public boolean avaliablityCheck(String isbnId) {
+      Book book = searchByisbnId(isbnId);
+      
+      if (book.isAvailable()) {
+    	  return true;
+      }
         return false;
     }
 
